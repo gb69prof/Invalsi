@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Simulazione INVALSI Italiano – Quinta superiore</title>
+  <meta name="description" content="Simulazione tipo INVALSI di Italiano (grado 13) con tre tipologie di testo: narrativo, espositivo-argomentativo, regolativo. Risultati esportabili e invio via email (mailto)." />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#111111" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">I</div>
+      <div class="brand-text">
+        <div class="title">Simulazione INVALSI Italiano</div>
+        <div class="subtitle">Quinta superiore · 3 tipologie di testo · CBT</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn btn-ghost" id="btnToggleTheme" type="button" title="Cambia tema">Tema</button>
+      <button class="btn btn-ghost" id="btnReset" type="button" title="Azzera tutto">Reset</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="card-head">
+        <h1>Prova completa</h1>
+        <p class="muted">
+          Durata consigliata: <strong>120 minuti</strong>. Compila i dati, poi svolgi le tre sezioni.
+          Alla fine puoi esportare i risultati e inviarli via email.
+        </p>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="field">
+          <label for="studentName">Nome e cognome</label>
+          <input id="studentName" type="text" placeholder="Es. Mario Rossi" autocomplete="name" />
+        </div>
+        <div class="field">
+          <label for="studentClass">Classe</label>
+          <input id="studentClass" type="text" placeholder="Es. 5A / 5 Turismo / 5 Grafico" />
+        </div>
+        <div class="field">
+          <label for="studentSchool">Scuola (opzionale)</label>
+          <input id="studentSchool" type="text" placeholder="Es. IIS …" />
+        </div>
+        <div class="field">
+          <label for="studentEmail">Email studente (opzionale)</label>
+          <input id="studentEmail" type="email" placeholder="Es. studente@email.it" autocomplete="email" />
+        </div>
+      </div>
+
+      <div class="row row-wrap">
+        <div class="timer">
+          <div class="timer-label">Timer</div>
+          <div class="timer-value" id="timerValue">120:00</div>
+        </div>
+        <div class="row row-wrap">
+          <button class="btn" id="btnStart" type="button">Avvia</button>
+          <button class="btn btn-ghost" id="btnPause" type="button" disabled>Pausa</button>
+          <button class="btn btn-ghost" id="btnResume" type="button" disabled>Riprendi</button>
+          <button class="btn btn-ghost" id="btnStop" type="button" disabled>Termina</button>
+        </div>
+      </div>
+
+      <div class="notice">
+        <strong>Nota tecnica:</strong> l’invio “diretto” via web senza server non è possibile in modo affidabile.
+        Qui trovi due opzioni: <em>1)</em> “Apri email” (mailto) con riepilogo + testo copiabile; <em>2)</em> download del file risultati (.json).
+        Se vuoi un invio automatico, serve un endpoint (es. Google Apps Script / Formspree): trovi indicazioni nel file <code>README.md</code>.
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="tabs" role="tablist" aria-label="Sezioni della prova">
+        <button class="tab active" role="tab" aria-selected="true" id="tabNarr" data-target="secNarr">Testo narrativo</button>
+        <button class="tab" role="tab" aria-selected="false" id="tabExpo" data-target="secExpo">Testo espositivo-argomentativo</button>
+        <button class="tab" role="tab" aria-selected="false" id="tabReg" data-target="secReg">Testo regolativo</button>
+        <button class="tab" role="tab" aria-selected="false" id="tabResults" data-target="secResults">Risultati</button>
+      </div>
+
+      <div class="tab-panels">
+        <section id="secNarr" class="panel active" role="tabpanel" aria-labelledby="tabNarr">
+          <div class="panel-head">
+            <h2>Sezione A · Comprensione (testo narrativo)</h2>
+            <p class="muted">Leggi il testo e rispondi alle domande. Alcune sono a scelta multipla, altre a risposta breve.</p>
+          </div>
+          <div id="narrativeMount"></div>
+        </section>
+
+        <section id="secExpo" class="panel" role="tabpanel" aria-labelledby="tabExpo">
+          <div class="panel-head">
+            <h2>Sezione B · Comprensione e interpretazione (testo espositivo-argomentativo)</h2>
+            <p class="muted">Concentrati su tesi, argomenti, connettivi, lessico in contesto.</p>
+          </div>
+          <div id="expositoryMount"></div>
+        </section>
+
+        <section id="secReg" class="panel" role="tabpanel" aria-labelledby="tabReg">
+          <div class="panel-head">
+            <h2>Sezione C · Testo regolativo + riflessione sulla lingua</h2>
+            <p class="muted">Leggi istruzioni e regole; poi rispondi a quesiti su scelte linguistiche, coesione e uso dei connettivi.</p>
+          </div>
+          <div id="regulativeMount"></div>
+        </section>
+
+        <section id="secResults" class="panel" role="tabpanel" aria-labelledby="tabResults">
+          <div class="panel-head">
+            <h2>Risultati</h2>
+            <p class="muted">
+              Quando hai finito tutte le sezioni, premi “Calcola risultati”.
+              Puoi esportare e inviare al docente.
+            </p>
+          </div>
+
+          <div class="row row-wrap">
+            <button class="btn" id="btnScore" type="button">Calcola risultati</button>
+            <button class="btn btn-ghost" id="btnDownload" type="button" disabled>Scarica risultati (.json)</button>
+            <button class="btn btn-ghost" id="btnCopy" type="button" disabled>Copia riepilogo</button>
+            <button class="btn btn-ghost" id="btnMailto" type="button" disabled>Apri email</button>
+          </div>
+
+          <div class="results-grid">
+            <div class="results-card">
+              <div class="results-title">Punteggio totale</div>
+              <div class="results-big" id="scoreTotal">—</div>
+              <div class="muted" id="scoreMeta">—</div>
+            </div>
+            <div class="results-card">
+              <div class="results-title">Per sezione</div>
+              <div class="results-lines" id="scoreBySection">—</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="resultsText">Testo riepilogo (copiabile)</label>
+            <textarea id="resultsText" rows="12" readonly placeholder="Qui comparirà il riepilogo..."></textarea>
+          </div>
+
+          <div class="notice small">
+            Destinatario impostato: <strong id="teacherEmail">gb.prof.69@gmail.com</strong>
+            · Puoi cambiarlo nel file <code>assets/js/app.js</code> (costante <code>TEACHER_EMAIL</code>).
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="muted">
+        Simulazione didattica · Non affiliata a INVALSI · Offline-ready (PWA leggera).
+      </div>
+    </footer>
+  </main>
+
+  <script src="assets/js/app.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+    }
+  </script>
+</body>
+</html>
